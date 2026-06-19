@@ -123,7 +123,8 @@ export default function AgendaPage() {
       .from("presences")
       .select("*")
       .eq("date", date)
-      .order("hour", { ascending: true });
+      .order("hour", { ascending: true })
+      .order("created_at", { ascending: true });
 
     if (presenceError) {
       setMessage(presenceError.message);
