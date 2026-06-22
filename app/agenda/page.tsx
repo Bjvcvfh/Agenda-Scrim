@@ -71,12 +71,14 @@ export default function AgendaPage() {
 
     for (let day = 1; day <= lastDay.getDate(); day++) {
       const date = new Date(year, month, day);
+      const isToday = date.getTime() === today.getTime();
+
       days.push({
         day,
         date,
         dateString: formatDateLocal(date),
-        isPast: date < today,
-        isToday: date.getTime() === today.getTime(),
+        isDisabled: !isToday,
+        isToday,
       });
     }
 
@@ -166,8 +168,8 @@ export default function AgendaPage() {
     setScrims(scrimData || []);
   }
 
-  function selecionarDia(dateString: string, isPast: boolean) {
-    if (isPast) return;
+  function selecionarDia(dateString: string, isDisabled: boolean) {
+    if (isDisabled) return;
 
     setSelectedDate(dateString);
     setSelectedHour(null);
@@ -307,6 +309,10 @@ export default function AgendaPage() {
 
   useEffect(() => {
     carregarUsuario();
+
+    const hoje = formatDateLocal(new Date());
+    setSelectedDate(hoje);
+    carregarDadosDoDia(hoje);
   }, []);
 
   useEffect(() => {
@@ -378,8 +384,8 @@ export default function AgendaPage() {
             {currentMonthDays.days.map((day) => (
               <button
                 key={day.dateString}
-                disabled={day.isPast}
-                onClick={() => selecionarDia(day.dateString, day.isPast)}
+                disabled={day.isDisabled}
+                onClick={() => selecionarDia(day.dateString, day.isDisabled)}
                 className={`
                   aspect-square rounded-xl border text-sm sm:text-base font-semibold
                   ${
@@ -388,7 +394,7 @@ export default function AgendaPage() {
                       : "bg-zinc-800 border-zinc-700"
                   }
                   ${
-                    day.isPast
+                    day.isDisabled
                       ? "opacity-25 cursor-not-allowed"
                       : "hover:bg-blue-700"
                   }
